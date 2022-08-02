@@ -120,21 +120,21 @@ class HTMLElement{
 
 // MARK: Copy on Assigment
 
-//struct Foo {
-//    let age = 1
-//}
-//
-//func testCopyOnAssignment() {
-//   var var1 = Foo()
-//   var var2 = var1
-//    withUnsafePointer(to: &var1) {
-//        print("\($0)") // print address (Ex: 0x00007ffee6702fb0)
-//    }
-//    withUnsafePointer(to: &var2) {
-//        print("\($0)") // print different address (Ex: 0x00007ffee6702fa8)
-//    }
-//}
-//testCopyOnAssignment()
+struct Foo {
+    let age = 1
+}
+
+func testCopyOnAssignment() {
+   var var1 = Foo()
+   var var2 = var1
+    withUnsafePointer(to: &var1) {
+        print("\($0)") // print address (Ex: 0x00007ffee6702fb0)
+    }
+    withUnsafePointer(to: &var2) {
+        print("\($0)") // print different address (Ex: 0x00007ffee6702fa8)
+    }
+}
+testCopyOnAssignment()
 
 
 // MARK: Copy on Write
@@ -149,3 +149,25 @@ address(o: newVar)
 address(o: newVar1)
 newVar[0].root = 3
 address(o: newVar)
+
+
+
+class Example {
+
+     var counter = 1
+    
+     var closure : (() -> ())?
+    
+    init() {
+        closure = { [weak self] in
+            self?.counter += 1
+            print(self?.counter)
+        }
+    }
+    deinit{
+        print("Deallocated")
+    }
+}
+var eg : Example? = Example()
+eg?.closure!()
+eg = nil

@@ -526,6 +526,240 @@ func searchRange(_ nums: [Int], _ target: Int) -> [Int] {
     return [result.first!,result.last!]
 }
 
+
+
+func flatten(_ root: TreeNode?) {
+    guard let root = root else {
+        return
+    }
+    var stack = [TreeNode]()
+    var node : TreeNode? = nil
+    stack.append(root)
+    while !stack.isEmpty{
+        node = stack.popLast()
+        if node!.right != nil{
+            stack.append(node!.right!)
+        }
+        if node!.left != nil{
+            stack.append(node!.left!)
+        }
+        if !stack.isEmpty{
+            node?.right = stack.last
+        }
+        node?.left = nil
+    }
+}
+
+func isAnagram(_ s: String, _ t: String) -> Bool {
+    var arr1 = Array(s)
+    var arr2 = Array(t)
+    if arr1.count != arr2.count{
+        return false
+    }
+    var map = [Character:Int]()
+    var map1 = [Character:Int]()
+    for i in arr1 {
+        map[i,default:0] += 1
+       
+    }
+    for j in arr2{
+        map1[j,default: 0] += 1
+    }
+    
+    return map == map1
+
+}
+
+
+func findAndReplacePattern(_ words: [String], _ pattern: String) -> [String] {
+    var ans = [String]()
+    for value in words{
+        if findComp(value, pattern){
+            ans.append(value)
+        }
+    }
+    return ans
+}
+
+func findComp(_ word: String,_ pattern:String) -> Bool{
+    var map1 = [Character: Character]()
+    var map2 = [Character: Character]()
+    for i in word.indices{
+        let f = word[i]
+        let s = pattern[i]
+        if map1[f] == nil{
+            map1[f] = s
+        }
+        if map2[s] == nil{
+            map2[s] = f
+        }
+        print(map1,map2)
+        if map1[f] != s || map2[s] != f{
+            return false
+        }
+    }
+    return true
+}
+
+
+func wordSubsets(_ words1: [String], _ words2: [String]) -> [String] {
+    var ans = [String]()
+    ans = checkCount(words1, words2)
+    return ans
+}
+
+func isSubset(_ s:String,_ word:[Character:Int]) -> Bool{
+    var word = word
+    for i in s{
+        if let value = word[i]{
+            let updateValue = value-1
+            word[i] = updateValue == 0 ? nil : updateValue
+        }
+    }
+    return word.count == 0 ? true : false
+}
+
+func mapper(_ word: String) -> [Character:Int] {
+    var map =  [Character:Int]()
+    for i in word{
+        map[i,default: 0] += 1
+    }
+    return map
+}
+
+func checkSuperSet(_ map1: [Character:Int],_ map2:[Character:Int]) -> [Character:Int]{
+    var map = map1
+    for (i,j) in map2 {
+        if let value =  map[i]{
+            map[i] = max(value,j)
+        } else{
+            map[i] = j
+        }
+    }
+    return map
+}
+
+func checkCount(_ word:[String],_ word2: [String]) -> [String]{
+    var map1 = [Character:Int]()
+    var result = [String]()
+    for j in word2{
+        if map1.isEmpty{
+            map1 = mapper(j)
+            continue
+        }
+        let map2 = mapper(j)
+        map1 = checkSuperSet(map1,map2)
+    }
+    for i in word{
+        if isSubset(i, map1){
+            result.append(i)
+        }
+    }
+    return result
+}
+
+
+func minimumOperations(_ nums: [Int]) -> Int {
+    
+    var length = nums.count
+    var nums = nums.sorted()
+    var j = 0
+    var ans = 0
+    for i in 0..<length{
+        while j < length && nums[j] == 0{
+            j += 1
+        }
+        if j == length{
+            break
+        }
+        let value  = nums[j]
+        for i in 0..<length{
+            if nums[i] != 0{
+                nums[i] -= value
+            }
+        }
+        
+        ans+=1
+        nums.sorted()
+    }
+    return ans
+}
+
+func maximumGroups(_ grades: [Int]) -> Int {
+    var grades = grades.sorted()
+    var length = grades.count
+    var start = 1
+    var ans = 0
+    while length > 0{
+        length-=start
+        ans+=1
+        start+=1
+        if start > length{
+            break
+        }
+    }
+    return ans
+}
+
+class NumArray {
+
+    var storage : [Int]
+    init(_ nums: [Int]) {
+        storage = nums
+    }
+    
+    func update(_ index: Int, _ val: Int) {
+        guard index >= 0 && index < storage.count else{
+            return
+        }
+        storage[index] = val
+    }
+    
+    func sumRange(_ left: Int, _ right: Int) -> Int {
+        guard left >= 0 && left < storage.count else{
+            return 0
+        }
+        guard right >= 0 && right < storage.count else{
+            return 0
+        }
+        guard left <= right else{
+            return 0
+        }
+        var total = 0
+        for k in left...right{
+            total = storage[k]
+        }
+        return total
+    }
+}
+
+func path(_ m: Int,_ n: Int,_ dp: inout [[Int]]) -> Int{
+    for i in 0...m{
+        for j in 0...n{
+            if i == 0 && j == 0{
+                dp[i][j] = 1
+            } else {
+                var up = 0
+                var left = 0
+                if i > 0{
+                    up = dp[i-1][j]
+                }
+                if j > 0{
+                    left = dp[i][j-1]
+                }
+                dp[i][j] = up + left
+            }
+        }
+    }
+    return dp[m][n]
+}
+
+
+func uniquePaths(_ m: Int, _ n: Int) -> Int {
+    var arr = Array(repeating: Array(repeating: -1, count: n+1), count: m+1)
+    return  path(m-1,n-1,&arr)
+}
+
 //maximumUnits([[5,10],[2,5],[4,7],[3,9]],10)
 //maxArea(5,4,[1,2,4],[1,3]
 //wiggleMaxLength([1,17,5,10,13,15,10,5,16,8])
@@ -537,17 +771,24 @@ func searchRange(_ nums: [Int], _ target: Int) -> [Int] {
 //makesquare([1,1,2,2,2])
 //makesquare([4,8,12,16,20,24,28,32,36,40,44,48])
 //levelOrder(TreeNode(3, TreeNode(9, nil, nil), TreeNode(20, TreeNode(15,nil,nil), TreeNode(7))))
-var arr1 = [3,9,20,15,7]
-var arr2 = [9,3,15,20,7]
+//var arr1 = [3,9,20,15,7]
+//var arr2 = [9,3,15,20,7]
 //buildTree(&arr1,&arr2)
 //maxAreaOfIsland([[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]])
 //findPaths(2,2,2,0,0)
 //kInversePairs(1000,1000)
 //generate(2)
 //numMatchingSubseq("abcde",["a","bb","acd","ace"])
-var arr = [5]
-var list = ListNode(1, ListNode(4, ListNode(3,ListNode(2, ListNode(5, ListNode(2))))))
+//var arr = [5]
+//var list = ListNode(1, ListNode(4, ListNode(3,ListNode(2, ListNode(5, ListNode(2))))))
 //reverseBetween(list,1,4)
 //partition(list, 3)
 //searchMatrix([[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]],5)
-searchRange([5,7,7,8,8,10],6)
+//searchRange([5,7,7,8,8,10],6)
+//flatten(TreeNode(1, TreeNode(2, TreeNode(3), TreeNode(5)), TreeNode(5, nil, TreeNode(6))))
+//isAnagram("anagram","nagaram")
+//findAndReplacePattern(["abc","deq","mee","aqq","dkd","ccc"],"abb")
+//wordSubsets(["amazon","apple","facebook","google","leetcode"],["l","e"])
+minimumOperations([1,5,0,3,5])
+maximumGroups([10,6,12,7,3,5])
+uniquePaths(3, 7)

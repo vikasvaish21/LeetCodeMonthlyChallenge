@@ -1,56 +1,57 @@
 import UIKit
-import Foundation
 
-var greeting = "Hello, playground"
-
-protocol Driving {
-    func startDriving()
-    func isDriving() ->  Bool
-    func stopDriving()
+protocol Engine {
+     func startEngine()
+     func stopEngine()
+ }
+ 
+ class TrainEngine: Engine {
+     func startEngine() {
+         print("Engine started")
+     }
+     
+     func stopEngine() {
+         print("Engine stopped")
+     }
+ }
+ 
+ protocol TrainCar {
+ var numberOfSeats: Int { get }
+ func attachCar(attach: Bool)
+}
+class RestaurantCar: TrainCar {
+    var numberOfSeats: Int {
+        get {
+            return 30
+        }
+    }
+    func attachCar(attach: Bool) {
+        print("Attach car")
+    }
 }
 
-class BMW : Driving {
-    func startDriving() {
-        
+class PassengerCar: TrainCar {
+    var numberOfSeats: Int {
+        get {
+            return 50
+        }
     }
-    
-    func isDriving() ->  Bool{
-        return true
+    func attachCar(attach: Bool) {
+        print("Attach car")
     }
-    
-    func stopDriving() {
-        
-    }
-    
-    
 }
-
-class Honda : Driving {
-    func startDriving() {
-        
+    
+class Train {
+    let engine: Engine?
+    var mainCar: TrainCar?
+//MARK: constructor Injection
+    init(engine: Engine){
+        self.engine = engine
     }
-    
-    func isDriving() ->  Bool{
-        return true
-    }
-    
-    func stopDriving() {
-        
-    }
-    
-    
 }
 
 
-class SelectedCar{
-    
-    let car: Driving
-    
-    init (car : Driving) {
-        self.car = car
-    }
-    
-}
 
-var selection = SelectedCar(car: BMW())
-var selection2 = SelectedCar(car: Honda())
+let train = Train(engine: TrainEngine())
+// MARK: Property Injection
+train.mainCar = PassengerCar()
