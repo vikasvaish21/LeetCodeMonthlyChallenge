@@ -760,6 +760,22 @@ func uniquePaths(_ m: Int, _ n: Int) -> Int {
     return  path(m-1,n-1,&arr)
 }
 
+func mirrorReflection(_ p: Int, _ q: Int) -> Int {
+    var ext = q
+    var ref = p
+    while ext%2 == 0 && ref%2 == 0{
+        ext/=2
+        ref/=2
+    }
+    if ext%2 == 0 && ref%2 != 0 {return 0}
+    if ext%2 == 1 && ref%2 == 0 {return 2}
+    if ext%2 == 1 && ref%2 != 0 {return 1}
+    return -1
+        
+}
+
+
+
 //maximumUnits([[5,10],[2,5],[4,7],[3,9]],10)
 //maxArea(5,4,[1,2,4],[1,3]
 //wiggleMaxLength([1,17,5,10,13,15,10,5,16,8])
@@ -792,3 +808,4 @@ func uniquePaths(_ m: Int, _ n: Int) -> Int {
 minimumOperations([1,5,0,3,5])
 maximumGroups([10,6,12,7,3,5])
 uniquePaths(3, 7)
+mirrorReflection(2,1)

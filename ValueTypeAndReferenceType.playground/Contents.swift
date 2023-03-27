@@ -1,5 +1,6 @@
 import Foundation
 import CoreFoundation
+import UIKit
 import PlaygroundSupport
 PlaygroundPage.current.needsIndefiniteExecution = true
 // MARK: Retain Cycle Working
@@ -120,54 +121,56 @@ class HTMLElement{
 
 // MARK: Copy on Assigment
 
+
+
+class MemoryAddress {
+
+    static func printReferenceTypeAddress(reference: AnyObject) {
+        print(Unmanaged.passUnretained(reference).toOpaque())
+    }
+    
+    static func printValueTypeAddress(value: UnsafeRawPointer){
+        let bitPattern = Int(bitPattern: value)
+        print(NSString(format: "%p", bitPattern))
+    }
+}
 struct Foo {
     let age = 1
 }
 
-func testCopyOnAssignment() {
-   var var1 = Foo()
-   var var2 = var1
-    withUnsafePointer(to: &var1) {
-        print("\($0)") // print address (Ex: 0x00007ffee6702fb0)
-    }
-    withUnsafePointer(to: &var2) {
-        print("\($0)") // print different address (Ex: 0x00007ffee6702fa8)
+class CopyOnAssignment:UIViewController{
+    var var1 = Foo()
+    override func viewDidLoad() {
+        var var2 = var1
+        MemoryAddress.printValueTypeAddress(value: &var1)
+        MemoryAddress.printValueTypeAddress(value: &var2)
     }
 }
-testCopyOnAssignment()
+var coa = CopyOnAssignment()
+coa.viewDidLoad()
 
 
 // MARK: Copy on Write
 
 struct Maze{
     var root : Int
-}
-
-var newVar = [Maze(root: 2)]
-var newVar1 = newVar
-address(o: newVar)
-address(o: newVar1)
-newVar[0].root = 3
-address(o: newVar)
-
-
-
-class Example {
-
-     var counter = 1
-    
-     var closure : (() -> ())?
-    
-    init() {
-        closure = { [weak self] in
-            self?.counter += 1
-            print(self?.counter)
-        }
-    }
-    deinit{
-        print("Deallocated")
+    init(withRoot _root: Int){
+        root = _root
     }
 }
-var eg : Example? = Example()
-eg?.closure!()
-eg = nil
+class copyOnWrite: UIViewController{
+    var newVar = [Maze(withRoot: 2)]
+    override func viewDidLoad() {
+        var newVar1 = newVar
+        MemoryAddress.printValueTypeAddress(value: &newVar1)
+        MemoryAddress.printValueTypeAddress(value: &newVar)
+        newVar[0].root = 3
+        MemoryAddress.printValueTypeAddress(value: &newVar1)
+        MemoryAddress.printValueTypeAddress(value: &newVar)
+    }
+   
+}
+
+
+var cow = copyOnWrite()
+//cow.viewDidLoad()

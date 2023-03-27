@@ -1,5 +1,8 @@
 import UIKit
 
+
+let dummy = ListNode(0)
+var nodes = [ListNode](repeating: dummy, count: 1000)
 class MyLinkedList {
     
     class ListNode {
@@ -228,22 +231,199 @@ class Solution {
         return nums[0]
     }
     
+    func oddEvenList(_ head: ListNode?) -> ListNode? {
+        guard let head = head else{
+            return nil
+        }
+        var odd = head
+        var even = head.next
+        var evenHead = even
+        while even != nil && even?.next != nil{
+            odd.next = odd.next?.next
+            even?.next = even?.next?.next
+            odd = odd.next!
+            even = even?.next
+        }
+        odd.next = evenHead
+        return head
+    }
+    
+//    func deleteDuplicates(_ head: ListNode?) -> ListNode? {
+//        guard let head = head else{
+//            return nil
+//        }
+//        var node = head
+//        while node != nil && node.next != nil{
+//            if node.val == node.next?.val{
+//                node.next = node.next?.next
+//            }else{
+//                node = node.next!
+//            }
+//        }
+//        return head
+//    }
+    
+    
+    func deleteDuplicates(_ head: ListNode?) -> ListNode? {
+        var dummy = ListNode(0)
+        var fast: ListNode? = head
+        var slow: ListNode? = dummy
+        slow?.next = fast
+        
+        while fast != nil{
+            while fast?.next != nil && fast?.val == fast?.next?.val{
+                fast = fast?.next!
+            }
+            if slow?.next !== fast{
+                slow?.next = fast?.next
+                fast = slow?.next
+            }else{
+                slow = slow?.next
+                fast = fast?.next
+            }
+        }
+        return dummy.next
+    }
+    
+//    func reverseKGroup(_ head: ListNode?, _ k: Int) -> ListNode? {
+//        guard let head = head else{
+//            return nil
+//        }
+//
+//    }
+    func rotateRight(_ head: ListNode?, _ k: Int) -> ListNode? {
+        guard head?.next != nil else{
+            return head
+        }
+        var fast = head
+        var len = 1
+        while fast?.next != nil {
+            fast = fast?.next!
+            len += 1
+        }
+        fast?.next = head
+        for _ in 0..<len-k%len{
+            fast = fast?.next!
+        }
+        var newHead = fast?.next
+        fast?.next = nil
+        return newHead
+    }
+   
+    func splitListToParts(_ head: ListNode?, _ k: Int) -> [ListNode?] {
+        guard k > 1 else {
+            return [head]
+        }
+        
+        var fast = head
+        var len = 0
+        while let node = fast{
+            nodes[len] = node
+            fast = fast?.next
+            len += 1
+        }
+        var result = [ListNode?](repeating: nil, count: k)
+        var (readIndex,writeIndex) = (0,0)
+        let (nodePerPrice,modulo) = (len/k,len%k)
+        while readIndex < len{
+            result[writeIndex] = nodes[readIndex]
+            readIndex += nodePerPrice + (writeIndex < modulo ? 1:0)
+            writeIndex += 1
+            nodes[readIndex-1].next = nil
+        }
+        return result
+    }
+    
+    func deleteNode(_ node: ListNode?) {
+        guard let nextNode = node?.next else{
+            return
+        }
+        node?.val = nextNode.val
+        node?.next = nextNode.next
+    }
+    
+    func detectCycle(_ head: ListNode?) -> ListNode? {
+        var slow = head
+        var fast = head
+        while fast?.next != nil && fast?.next?.next != nil{
+            slow = slow?.next
+            fast = fast?.next?.next
+            if slow === fast{
+                slow = head
+                while slow !== fast{
+                    slow = slow?.next
+                    fast = fast?.next
+                }
+                return slow
+            }
+        }
+        return nil
+    }
+    
+    func mergeAgainKLists(_ lists: [ListNode?]) -> ListNode? {
+        var count = lists.count
+        if lists.isEmpty{
+            return nil
+        } else if count == 1{
+            return lists[0]
+        }
+        return partionMerge(lists, 0, lists.count-1)
+    }
+    
+    func partionMerge(_ list:[ListNode?],_ start:Int,_ end: Int) -> ListNode?{
+        if start == end{
+            return list[start]
+        }
+        if start + 1 == end{
+            return partionMergeNode(list[start], list[end],list)
+        }
+        if start < end{
+            let middle = start + (end - start)/2
+            let list1 = partition(list, start, middle)
+            let list2 = partition(list, middle+1, end)
+            return partionMergeNode(list1, list2, list)
+        }
+        return nil
+    }
+    
+    func partionMergeNode(_ list1: ListNode?,_ list2: ListNode?,_ lists:[ListNode?]) -> ListNode? {
+        var result: ListNode? = nil
+        if list1 == nil {
+            return list2
+        }
+        if list2 == nil {
+            return list1
+        }
+        if list1!.val <= list2!.val{
+            result = list1
+            result?.next = partionMergeNode(list1?.next, list2, lists)
+        } else if list1!.val > list2!.val{
+            result = list2
+            result?.next = partionMergeNode(list1, list2?.next, lists)
+        }
+        return result
+    }
+    
 }
 
 
 
-var node1 = ListNode(1, ListNode(4, ListNode(5)))
+
+
+
+var node1 = ListNode(4, ListNode(5, ListNode(1,ListNode(9))))
 var node2 = ListNode(1, ListNode(3, ListNode(3)))
 var node3 = ListNode(2, ListNode(6))
+var node = ListNode(1,ListNode(2, ListNode(3, ListNode(4, ListNode(5)))))
 var sol = Solution()
 //var result = sol.mergeKLists([node1,node2,node3])
 //var result = sol.mergeNode(node1, node2)
-sol.firstMissingPositive([3,4,-1,1])
-sol.findDuplicate([1,3,4,2,2])
-//var arr = [Int]()
-//while result != nil{
-//    arr.append(result!.val)
-//    result = result?.next
-//}
-//print(arr)
-
+//sol.firstMissingPositive([3,4,-1,1])
+//sol.findDuplicate([1,3,4,2,2])
+//sol.oddEvenList(node)
+//sol.deleteDuplicates(node1)
+//sol.reverseKGroup(node1, 2)
+//sol.rotateRight(node1,2)
+sol.splitListToParts(node1, 3)
+sol.deleteNode(node1)
+sol.mergeAgainKLists([node1,node2,node3])
